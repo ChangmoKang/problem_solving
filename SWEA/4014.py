@@ -26,7 +26,7 @@ for tc in range(1, int(input()) + 1):
                             if board[i][c] != board[i][j+1] or visited[c]:
                                 flag = 1
                                 break
-                        
+
                         if not flag:
                             c = j
                             for _ in range(K):
