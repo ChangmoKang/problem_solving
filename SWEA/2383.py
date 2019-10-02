@@ -33,26 +33,22 @@ def check(count):
         # 계단의 상태
         status = [[0]*3 for _ in range(2)]
         while True:
-            # 계단에 내려갈 수 있으면 내려간다.
+            # 계단에 있는 사람을 내려보내고 자리가 있으면 채워 넣는다.
             for idx in range(2):
                 for i in range(3):
+                    if status[idx][i] > 0:
+                        status[idx][i] -= 1
                     if wait[idx]:
                         if status[idx][i] == 0 and wait[idx][0] <= t:
                             wait[idx].pop(0)
                             status[idx][i] = stair[idx][2]
 
-            # 계단에 있는 사람을 한 칸씩 내린다.
-            for idx in range(2):
-                for i in range(3):
-                    if status[idx][i] > 0:
-                        status[idx][i] -= 1
-
             t += 1
 
             if not wait[0] and not wait[1] and not sum(status[0]) and not sum(status[1]):
                 break
-        if result > t + 1:
-            result = t + 1
+        if result > t:
+            result = t
     else:
         for i in range(2):
             choice[count] = i
