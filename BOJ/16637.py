@@ -50,14 +50,16 @@ for tc in range(1, int(input()) + 1):
     data = list(input())
 
     nums = [int(data[i]) for i in range(0, N, 2)]
-
     ops = [data[i] for i in range(1, N, 2)]
+
     N = len(nums)
     M = len(ops)
 
     result = -float('inf')
-    visited = [0]*M + [0]
 
+    # 괄호 없을 때 계산
     calc()
+
+    visited = [0]*M + [0]
     check(0)
     print(result)
