@@ -80,4 +80,3 @@ if room:
     print(result) if result != 26 else print(-1)
 else:
     print(0)
-
