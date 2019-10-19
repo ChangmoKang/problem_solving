@@ -52,7 +52,10 @@ for i in range(N):
             board[i][j] = 0
             room += 1
 
-result = float('inf')
-arr = [0]*K
-check(0, 0)
-print(result) if result != float('inf') else print(-1)
+if room:
+    result = float('inf')
+    arr = [0]*K
+    check(0, 0)
+    print(result) if result != float('inf') else print(-1)
+else:
+    print(0)
