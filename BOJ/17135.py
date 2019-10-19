@@ -9,7 +9,7 @@ def calc(archer, enemy):
 def check(count, start):
     global result
     if count == 3:
-        arrows = [arr[w][:] for w in range(3)]
+        arrows = [arr[w] for w in range(3)]
         targets = [TARGETS[w][:] for w in range(N)]
         kill = 0
         targets_idx = set(range(N))
