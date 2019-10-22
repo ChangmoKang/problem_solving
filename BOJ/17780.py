@@ -5,12 +5,12 @@ sys.stdin = open('input/17780.txt')
 def move(idx):
     r, c, d = chess[idx]
     rr, cc = chess[idx][0] + dr[d], chess[idx][1] + dc[d]
-    other_d = other_ways[d]
-    o_rr, o_cc = chess[idx][0] + dr[other_d], chess[idx][1] + dc[other_d]
 
     if 0 <= rr < N and 0 <= cc < N and board[rr][cc] != 2:
         return rr, cc, d
     elif not (0 <= rr < N and 0 <= cc < N) or board[rr][cc] == 2:
+        other_d = other_ways[d]
+        o_rr, o_cc = chess[idx][0] + dr[other_d], chess[idx][1] + dc[other_d]
         if 0 <= o_rr < N and 0 <= o_cc < N and board[o_rr][o_cc] != 2:
             return o_rr, o_cc, other_d
         elif not (0 <= o_rr < N and 0 <= o_cc < N) or board[o_rr][o_cc] == 2:
@@ -23,9 +23,18 @@ def check():
             r, c, _ = chess[idx]
             rr, cc, dd = move(idx)
             
-            if len(dic[r, c]) > 1:
-                start = dic[r, c].index(idx)
-                if start == 0:
+            start = dic[r, c].index(idx)
+            if start == 0:
+                if not (r == rr and c == cc):
+                    if board[rr][cc] == 1:
+                        dic[rr, cc].extend(dic[r, c][::-1])
+                    else:
+                        dic[rr, cc].extend(dic[r, c])
+
+                    if len(dic[rr, cc]) >= 4:
+                        return time
+
+                if len(dic[r, c]) > 1:
                     if board[rr][cc] == 1:
                         for x_idx in range(len(dic[r, c]) - 1, start - 1, -1):
                             x = dic[r, c][x_idx]
@@ -33,12 +42,6 @@ def check():
                                 chess[x] = [rr, cc, dd]
                             else:
                                 chess[x] = [rr, cc, chess[x][2]]
-
-                        if not (r == rr and c == cc):
-                            dic[rr, cc].extend(dic[r, c][::-1])
-                            if len(dic[rr, cc]) >= 4:
-                                return time
-                            dic[r, c] = []
                     else:
                         for x_idx in range(start, len(dic[r, c])):
                             x = dic[r, c][x_idx]
@@ -46,18 +49,9 @@ def check():
                                 chess[x] = [rr, cc, dd]
                             else:
                                 chess[x] = [rr, cc, chess[x][2]]
-
-                        if not (r == rr and c == cc):
-                            dic[rr, cc].extend(dic[r, c])
-                            if len(dic[rr, cc]) >= 4:
-                                return time
-                            dic[r, c] = []
-            else:
-                chess[idx] = [rr, cc, dd]
+                else:
+                    chess[idx] = [rr, cc, dd]
                 if not (r == rr and c == cc):
-                    dic[rr, cc].append(idx)
-                    if len(dic[rr, cc]) >= 4:
-                        return time
                     dic[r, c] = []
     return -1
 
