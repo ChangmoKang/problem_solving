@@ -26,7 +26,6 @@ def check():
             if len(dic[r, c]) > 1:
                 start = dic[r, c].index(idx)
                 if start == 0:
-                    trash = []
                     if board[rr][cc] == 1:
                         for x_idx in range(len(dic[r, c]) - 1, start - 1, -1):
                             x = dic[r, c][x_idx]
@@ -35,11 +34,11 @@ def check():
                             else:
                                 chess[x] = [rr, cc, chess[x][2]]
 
-                            if not (r == rr and c == cc):
-                                dic[rr, cc].append(x)
-                                if len(dic[rr, cc]) >= 4:
-                                    return time
-                                trash.append(x)
+                        if not (r == rr and c == cc):
+                            dic[rr, cc].extend(dic[r, c][::-1])
+                            if len(dic[rr, cc]) >= 4:
+                                return time
+                            dic[r, c] = []
                     else:
                         for x_idx in range(start, len(dic[r, c])):
                             x = dic[r, c][x_idx]
@@ -48,14 +47,11 @@ def check():
                             else:
                                 chess[x] = [rr, cc, chess[x][2]]
 
-                            if not (r == rr and c == cc):
-                                dic[rr, cc].append(x)
-                                if len(dic[rr, cc]) >= 4:
-                                    return time
-                                trash.append(x)
-                    if trash:
-                        for t in trash:
-                            dic[r, c].remove(t)
+                        if not (r == rr and c == cc):
+                            dic[rr, cc].extend(dic[r, c])
+                            if len(dic[rr, cc]) >= 4:
+                                return time
+                            dic[r, c] = []
             else:
                 chess[idx] = [rr, cc, dd]
                 if not (r == rr and c == cc):
