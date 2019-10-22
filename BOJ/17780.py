@@ -20,7 +20,7 @@ def move(idx):
 def check():
     for time in range(1, 1001):
         for idx in range(K):
-            r, c, d = chess[idx]
+            r, c, _ = chess[idx]
             rr, cc, dd = move(idx)
             
             if len(dic[r, c]) > 1:
