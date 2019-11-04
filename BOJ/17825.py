@@ -2,60 +2,70 @@ import sys
 sys.stdin = open('input/17825.txt')
 
 
-def check(count, sub_result, targets):
+def check(count, sub_result):
     global result
     if count == 10:
         if sub_result > result:
             result = sub_result
     else:
-        for move in range(1, 6):
-            # 주사위가 있다면
-            if turns[move]:
-                turns[move] -= 1
-                for target_index in range(4):
-                    # 말이 도착점에 도착하지 않았다면
-                    if targets[target_index] != [7, -1]:
-                        copied_targets = [targets[w][:] for w in range(4)]
-                        copied_sub_result = sub_result
+        move = TURNS[count]
+        for target_index in range(4):
+            if TARGETS[target_index] != [7, -1]:
+                copied_sub_result = sub_result
 
-                        r, c = copied_targets[target_index]
+                r, c = TARGETS[target_index]
 
-                        # 로직 시작
-                        if r < 3:
-                            if c + move == board_C[r] - 1:
-                                r += 4
-                                c = -1
-                            elif c + move > board_C[r] - 1:
-                                r += 1
-                                c = c + move - board_C[r]
-                            else:
-                                c += move
-                        else:
-                            if c + move > board_C[r] - 1:
-                                r = 7
-                                c = -1
-                            elif c + move == board_C[r] - 1:
-                                c = board_C[r] - 1
-                            else:
-                                c += move
+                if r < 3:
+                    if c + move > end_index[r]:
+                        rr = r + 1
+                        cc = c + move - end_index[r] - 1
+                        copied_sub_result += board[rr][cc]
+                    elif c + move == end_index[r]:
+                        rr = r
+                        cc = end_index[r]
+                        copied_sub_result += board[rr][cc]
+                        rr += 4
+                        cc = -1
+                    else:
+                        rr = r
+                        cc = c + move
+                        copied_sub_result += board[rr][cc]
+                else:
+                    if c + move > end_index[r]:
+                        rr = 7
+                        cc = -1
+                    elif c + move == end_index[r]:
+                        rr = r
+                        cc = end_index[r]
+                        copied_sub_result += board[rr][cc]
+                    else:
+                        rr = r
+                        cc = c + move
+                        copied_sub_result += board[rr][cc]
 
-                        flag = 0
-                        for x in range(4):
-                            if x != target_index:
-                                if [r, c] == copied_targets[x]:
-                                    flag = 1
+                flag = 0
+                for x in range(4):
+                    if x != target_index:
+                        if [rr, cc] == TARGETS[x] and [7, -1] != TARGETS[x] and [0, -1] != TARGETS[x]:
+                            flag = 1
+                            break
+                        elif 3 <= rr <= 6 and end_index[rr] == cc:
+                            if 3 <= TARGETS[x][0] <= 6 and end_index[TARGETS[x][0]] == TARGETS[x][1]:
+                                flag = 1
+                                break
+                        elif 4 <= rr <= 6 and -4 <= cc - (end_index[rr] + 1) <= -2:
+                            if 4 <= TARGETS[x][0] <= 6 and -4 <= TARGETS[x][1] - (end_index[TARGETS[x][0]] + 1) <= -2 and cc - (end_index[rr] + 1) == TARGETS[x][1] - (end_index[TARGETS[x][0]] + 1):
+                                flag = 1
+                                break
 
-                        if not flag:
-                            # 여기서부터 다시
-                            # copied_sub_result += board[r][c]
-                            check(count + 1, copied_sub_result, copied_targets)
-                turns[move] += 1
+                if not flag:
+                    TARGETS[target_index] = [rr, cc]
+                    check(count + 1, copied_sub_result)
+                    TARGETS[target_index] = [r, c]
 
 
 # 주사위 저장
-turns = [0]*6
-for el in map(int, input().split()):
-    turns[el] += 1
+TURNS = list(map(int, input().split()))
 
 # 판
 board = [
@@ -67,7 +77,8 @@ board = [
     [22, 24, 25, 30, 35, 40],
     [28, 27, 26, 25, 30, 35, 40]
 ]
-board_C = [len(board[x]) for x in range(len(board))]
+
+end_index = [len(board[x]) - 1 for x in range(len(board))]
 
 # 말
 TARGETS = [[0, -1] for _ in range(4)]
@@ -75,4 +86,5 @@ TARGETS = [[0, -1] for _ in range(4)]
 # 결과
 result = 0
 
-check(0, 0, TARGETS)
+check(0, 0)
+print(result)
