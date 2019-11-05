@@ -17,27 +17,35 @@ def check(r, c, left, right):
 
     visited[r + left + right][c - left + right] = 3
 
+
+    sum_list = [0,0,0,0]
+
     # 위로
     for x in range(r):
         visited[x][c] = 1
+        sum_list[0] += board[x][c]
 
     # 왼쪽
     for x in range(c - left):
         visited[r + left][x] = 4
+        sum_list[2] += board[r + left][x]
 
     # 오른쪽
     for x in range(c + right + 1, N):
         visited[r + right][x] = 2
+        sum_list[1] += board[r + right][x]
 
     # 아래
     for x in range(r + left + right + 1, N):
         visited[x][c - left + right] = 5
+        sum_list[3] += board[x][c - left + right]
 
     number = [1, 2, 4, 5]
     number_idx = 0
     for r in [0, N -1]:
         for c in [0, N - 1]:
             visited[r][c] = number[number_idx]
+            sum_list[number_idx] += board[r][c]
             q = [[r, c]]
             while q:
                 el = q.pop(0)
@@ -47,20 +55,8 @@ def check(r, c, left, right):
                     if 0 <= rr < N and 0 <= cc < N and not visited[rr][cc]:
                         visited[rr][cc] = number[number_idx]
                         q.append([rr, cc])
+                        sum_list[number_idx] += board[rr][cc]
             number_idx += 1
-    
-    sum_list = [0,0,0,0]
-
-    for rr in range(N):
-        for cc in range(N):
-            if visited[rr][cc] == 1:
-                sum_list[0] += board[rr][cc]
-            elif visited[rr][cc] == 2:
-                sum_list[1] += board[rr][cc]
-            elif visited[rr][cc] == 4:
-                sum_list[2] += board[rr][cc]
-            elif visited[rr][cc] == 5:
-                sum_list[3] += board[rr][cc]
 
     sum_list.append(total - sum(sum_list))
 
