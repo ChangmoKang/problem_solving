@@ -15,6 +15,7 @@ if not locks:
 else:
     answer = False
 
+flag = 0
 if not answer:
     for rotate_cnt in range(4):
         for idx1 in range(len(keys)):
@@ -42,6 +43,8 @@ if not answer:
 
                 if check_keys == locks:
                     answer = True
+                    flag = 1
+                    break
 
                 # 원래대로 돌려 놓기
                 for idx2 in range(len(keys)):
@@ -50,7 +53,12 @@ if not answer:
                         keys[idx2] = [rr - dr, cc - dc]
 
                 keys[idx1] = [r, c]
-        
+
+            if flag:
+                break
+        if flag:
+            break
+
         # 회전시키기
         if rotate_cnt < 3:
             for key_idx in range(len(keys)):
