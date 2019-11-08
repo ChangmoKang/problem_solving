@@ -26,14 +26,8 @@ for tc in range(1, int(input()) + 1):
         
         sub_answer = len(data) * x + len(s[front:])
         for i in range(len(num)):
-            if 1 < num[i] < 10:
-                sub_answer += 1
-            elif 10 <= num[i] < 100:
-                sub_answer += 2
-            elif 100 <= num[i] < 1000:
-                sub_answer += 3
-            elif num[i] == 1000:
-                sub_answer += 4
+            if num[i] != 1:
+                sub_answer += len(str(num[i]))
 
         if answer > sub_answer:
             answer = sub_answer
