@@ -1,4 +1,5 @@
 # 효율성 테스트 2번 통과 못함
+# 트라이(Trie) 자료구조를 사용해야 함
 import sys
 sys.stdin = open('input/2020_kakao_4.txt')
 
