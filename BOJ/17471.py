@@ -2,67 +2,60 @@ import sys
 sys.stdin = open('input/17471.txt')
 
 
-def check_relation(team, f, t):
-    q = [f]
-    visited = [0] * N
-    visited[f] = 1
+def bfs(team):
+    visited = [0]*N
+    q = [team[0]]
+    visited[team[0]] = 1
+    team.remove(team[0])
+
     while q:
-        tmp = q.pop(0)
-        for x in range(1, 1 + relation[tmp][0]):
-            if not visited[relation[tmp][x] - 1]:
-                if relation[tmp][x] - 1 == t:
-                    return 1
-                if (relation[tmp][x] - 1) not in team:
-                    continue
-                visited[relation[tmp][x] - 1] = 1
-                q.append(relation[tmp][x] - 1)
-    return 0
+        target = q.pop(0)
+        if team == []:
+            return True
+        
+        for i in range(N):
+            if adj[target][i] and i in team and not visited[i]:
+                q.append(i)
+                visited[i] = 1
+                team.remove(i)
+    return False
 
 
-def check(count):
+def check(count, one_side_sum):
     global result
     if count == N:
-        if 0 < sum(target) < N:
-            one_team = [w for w in range(N) if target[w]]
-            other_team = [w for w in range(N) if not target[w]]
-            sub_result = abs(sum([nums[w] for w in one_team]) - sum([nums[w] for w in other_team]))
-            
-            if result > sub_result:
-                for i in range(len(one_team)):
-                    flag1 = 0
-                    for j in range(i + 1, len(one_team)):
-                        if not check_relation(one_team, one_team[i], one_team[j]):
-                            flag1 = 1
-                            break
-                    if flag1:
-                        break
-                
-                for i in range(len(other_team)):
-                    flag2 = 0
-                    for j in range(i + 1, len(other_team)):
-                        if not check_relation(other_team, other_team[i], other_team[j]):
-                            flag2 = 1
-                            break
-                    if flag2:
-                        break
+        if sum(divide) == 0 or divide[0] == 1:
+            return
+        A = [x for x in range(N) if divide[x] == 1]
+        B = [x for x in range(N) if divide[x] == 0]
 
-                if not flag1 and not flag2:
-                    result = sub_result
+        if bfs(A) and bfs(B):
+            other_side_sum = total - one_side_sum
+            diff = abs(one_side_sum - other_side_sum)
+            if result > diff:
+                result = diff
     else:
         for i in range(2):
-            target[count] = i
-            check(count + 1)
-            target[count] = -1
+            divide[count] = i
+            if i:
+                check(count + 1, one_side_sum + people[count])
+            else:
+                check(count + 1, one_side_sum)
+            divide[count] = 0
 
 
-for tc in range(1, int(input()) + 1):
-    N = int(input())
-    nums = list(map(int, input().split()))
-    relation = [list(map(int, input().split())) for _ in range(N)]
+N = int(input())
+people = list(map(int, input().split()))
+total = sum(people)
+adj = [[0]*N for _ in range(N)]
+for i in range(N):
+    for j in list(map(int, input().split()))[1:]:
+        adj[i][j - 1] = 1
+        adj[j - 1][i] = 1
 
-    result = float('inf')
+result = float('inf')
 
-    target = [0] * N
-    check(0)
+divide = [0]*N
+check(0, 0)
 
-    print(-1) if result == float('inf') else print(result)
+print(result) if result != float('inf') else print(-1)
