@@ -23,7 +23,6 @@ if __name__ == "__main__":
         ["marina", "josipa", "nikola", "vinko", "filipa"],
         ["mislav", "stanko", "mislav", "ana"]
     ]
-
     INPUT2 = [
         ["eden", "kiki"],
         ["josipa", "filipa", "marina", "nikola"],
