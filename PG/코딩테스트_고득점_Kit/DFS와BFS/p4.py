@@ -1,20 +1,17 @@
 def solution(tickets):
-    def bfs():
-        VISITED = {key: [0]*len(value) for key, value in dic.items()}
-        q = [['ICN', ['ICN'], VISITED]]
-        while q:
-            f, sub_result, visited = q.pop(0)
-            if f in dic:
-                for index in range(len(dic[f])):
-                    # value를 shallow copy해주어야 한다.
-                    copied_visited = {key: value[:] for key, value in visited.items()}
-                    copied_sub_result = sub_result[:]
-                    if not copied_visited[f][index]:
-                        copied_visited[f][index] = 1
-                        copied_sub_result.append(dic[f][index])
-                        if len(copied_sub_result) == len(tickets) + 1:
-                            return copied_sub_result
-                        q.append([dic[f][index], copied_sub_result, copied_visited])
+
+    def dfs(count, List):
+        if not result:
+            if count == len(tickets):
+               result.append(List)
+            else:
+                if List[-1] in dic:
+                    for t_i in range(len(dic[List[-1]])):
+                        t = dic[List[-1]][t_i]
+                        if not visited[List[-1]][t_i]:
+                            visited[List[-1]][t_i] = 1
+                            dfs(count + 1, List + [t])
+                            visited[List[-1]][t_i] = 0
 
 
     dic = {}
@@ -23,12 +20,15 @@ def solution(tickets):
             dic[f] = [t]
         else:
             dic[f].append(t)
-    
+
     for key in dic:
         dic[key].sort()
 
-    result = bfs()
-    return result
+    result = []
+    visited = {key: [0]*len(value) for key, value in dic.items()}
+    dfs(0, ['ICN'])
+
+    return result[0]
 
 
 if __name__ == "__main__":
