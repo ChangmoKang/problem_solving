@@ -18,8 +18,6 @@ def solution(N, edge):
                     visited[t] = 1
                     q.append(t)
     return result
-        
-    
 
 
 if __name__ == "__main__":
