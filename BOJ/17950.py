@@ -8,7 +8,7 @@ factor = K
 for _ in range(H):
     result += factor * int(input())
     factor *= K
-    factor %= 1000000007 
+    factor %= 1000000007
 
 result %= 1000000007
 print(result)
