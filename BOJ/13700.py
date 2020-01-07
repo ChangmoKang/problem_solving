@@ -27,7 +27,8 @@ S, G = S - 1, G - 1
 d = [F, -B]
 
 board = [1]*N
-for police in map(int, input().split()):
-    board[police - 1] = 0
+if K:
+    for police in map(int, input().split()):
+        board[police - 1] = 0
 
 print(bfs())
