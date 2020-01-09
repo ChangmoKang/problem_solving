@@ -2,19 +2,6 @@ import sys
 sys.stdin = open('input/18243.txt')
 
 
-# def dfs(start, depth):
-#     global result
-#     if depth > 6:
-#         result = 1
-#     else:
-#         if not result:
-#             for index in range(1, N + 1):
-#                 if not visited[index]:
-#                     visited[index] = 1
-#                     dfs(i, depth + 1)
-#                     visited[index] = 0
-
-
 def bfs(start):
     visited = [0]*(N + 1)
     visited[start] = 1
