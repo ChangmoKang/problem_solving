@@ -2,81 +2,65 @@ import sys
 sys.stdin = open('input/17136.txt')
 
 
-def get_or_out_area(r, c, k, method):
-    if method:
-        for i in range(r, r + k):
-            for j in range(c, c + k):
-                board[i][j] = 0
-    else:
-        for i in range(r, r + k):
-            for j in range(c, c + k):
-                board[i][j] = 1
+def init():
+    for r in range(N):
+        for c in range(N):
+            if board[r][c]:
+                check(r, c)
+                return False
+    return True
 
 
-def check_area(r, c):
-    for k in range(5, 1, -1):
-        if r + k > N or c + k > N:
-            continue
-        flag = 0
-        for i in range(r, r + k):
-            for j in range(c, c + k):
-                if board[i][j] == 0:
-                    flag = 1
-                    break
-            if flag:
-                break
-        if not flag:
-            return k
-    return 1
-
-
-def move(r, c):
-    if c == N - 1:
-        r += 1
-        c = 0
-    else:
-        c += 1
-    return r, c
-
-
-def check(r, c, cnt):
+def check(r, c):
     global result
-    if cnt == room:
-        if result > 25 - sum(paper):
-            result = 25 - sum(paper)
-    else:
-        if result > 25 - sum(paper):
-            while True:
-                if board[r][c]:
-                    break
-                r, c = move(r, c)
-                if r == N:
-                    return
+    sub_result = 25 - sum(paper)
+    if result > sub_result:
+        if r == N:
+            result = sub_result
+        else:
+            for size in range(5, 0, -1):
+                if paper[size] and search(r, c, size):
+                    do(r, c, size, 0)
+                    paper[size] -= 1
+                    rr, cc = r, c
+                    while True:
+                        if cc == N - 1:
+                            rr += 1
+                            cc = 0
+                        else:
+                            cc += 1
 
-            RANGE = check_area(r, c)
-            for k in range(RANGE, 0, -1):
-                if paper[k]:
-                    get_or_out_area(r, c, k, 1)
-                    paper[k] -= 1
+                        if rr == N:
+                            check(rr, cc)
+                            break
+                            
+                        if board[rr][cc]:
+                            check(rr, cc)
+                            break
+                    do(r, c, size, 1)
+                    paper[size] += 1
 
-                    check(r, c, cnt + (k*k))
-                    paper[k] += 1
-                    get_or_out_area(r, c, k, 0)
+
+def search(r, c, size):
+    if not (0 <= r + size - 1 < N and 0 <= c + size - 1 < N):
+        return False
+
+    for i in range(r, r + size):
+        for j in range(c, c + size):
+            if board[i][j] == 0:
+                return False
+    return True
+
+
+def do(r, c, size, method):
+    for i in range(r, r + size):
+        for j in range(c, c + size):
+            board[i][j] = method
 
 
 N = 10
 board = [list(map(int, input().split())) for _ in range(N)]
 
-room = 0
-for i in range(N):
-    for j in range(N):
-        if board[i][j] == 1:
-            room += 1
-
-if room:
-    result = 26
-    paper = [0] + [5]*5
-    check(0, 0, 0)
-    print(result) if result != 26 else print(-1)
-else:
-    print(0)
+result = 26
+paper = [0] + [5]*5
+print(0) if init() else print(-1) if result == 26 else print(result)
