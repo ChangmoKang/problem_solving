@@ -2,66 +2,61 @@ import sys
 sys.stdin = open('input/17135.txt')
 
 
-def calc(archer, enemy):
-    return abs(archer[1] - enemy[1]) + abs(archer[0] - enemy[0])
-
-
 def check(count, start):
     global result
     if count == 3:
-        arrows = [arr[w] for w in range(3)]
         targets = [TARGETS[w][:] for w in range(N)]
-        kill = 0
-        targets_idx = set(range(N))
+
+        sub_result = 0
         for _ in range(R):
-            trash = set()
-            for arrow in arrows:
-                current_idx = None
-                current_dist = D + 1
-                for idx in list(targets_idx):
-                    dist = calc(arrow, targets[idx])
-                    if dist < current_dist:
-                        current_idx = idx
-                        current_dist = dist
-                    elif dist == current_dist and current_idx != None:
-                        if targets[idx][1] <= targets[current_idx][1]:
-                            current_idx = idx
-                if current_idx != None:
-                    trash.add(current_idx)
+            kills = list()
+            for archer in archers:
+                min_d = D
+                min_l = None
+                for target in targets:
+                    target_r, target_c = target
+                    d = abs(R - target_r) + abs(archer - target_c)
+                    if min_d > d:
+                        min_d = d
+                        min_l = target
+                    elif min_d == d:
+                        if min_l == None or min_l[1] > target_c:
+                            min_l = target
 
-            if trash:
-                kill += len(trash)
-                targets_idx = targets_idx - trash
+                if min_l != None and min_l not in kills:
+                    kills.append(min_l)
 
-            trash = set()
+            sub_result += len(kills)
 
-            for idx in list(targets_idx):
-                targets[idx][0] += 1
-                if targets[idx][0] == R:
-                    trash.add(idx)
+            for kill in kills:
+                targets.remove(kill)
 
-            if trash:
-                targets_idx = targets_idx - trash
-        if kill > result:
-            result = kill
+            trash = list()
+            for index in range(len(targets)):
+                target_r, target_c = targets[index]
+                targets[index] = [target_r + 1, target_c]
+                if targets[index][0] == R:
+                    trash.append(targets[index])
+            
+            for t in trash:
+                targets.remove(t)
+
+        result = max(sub_result, result)
+
     else:
         for i in range(start, C):
-            arr[count][1] = i
+            archers[count] = i
             check(count + 1, i + 1)
-            arr[count][1] = 0
+            archers[count] = -1
 
 
 R, C, D = map(int, input().split())
 board = [list(map(int, input().split())) for _ in range(R)]
-
-TARGETS = []
-for i in range(R - 1, -1, -1):
-    for j in range(C):
-        if board[i][j] == 1:
-            TARGETS.append([i, j])
-
+TARGETS = [[r, c] for r in range(R - 1, -1, -1) for c in range(C) if board[r][c]]
 N = len(TARGETS)
-result = 0
-arr = [[R,0] for _ in range(3)]
+
+result = -1
+archers = [-1]*3
 check(0, 0)
+
 print(result)
