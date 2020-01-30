@@ -2,78 +2,90 @@ import sys
 sys.stdin = open('input/17822.txt')
 
 
-dr = [-1, 1, 0, 0]
-dc = [0, 0, -1, 1]
-R, C, K = map(int, input().split())
-board = [list(map(int, input().split())) for _ in range(R)]
-methods = [list(map(int, input().split())) for _ in range(K)]
+spin = {0: -1, 1: 1}
+N, M, T = map(int, input().split())
+board = [[0]*M] + [list(map(int, input().split())) for _ in range(N)]
+N += 1
+methods = [list(map(int, input().split())) for _ in range(T)]
 
 
-visit_cnt = R * C
-cnt_flag = 0
+num = (N - 1) * M
+value = sum([sum(board[index]) for index in range(1, N)])
+
 for x, d, k in methods:
-    x_index = 1
-    while True:
-        board_index = x * x_index - 1
-        if board_index > R - 1:
-            break
-
-        if d == 0:
-            board[board_index] = board[board_index][-k:C] + board[board_index][:-k]
-        else:
-            board[board_index] = board[board_index][k:C] + board[board_index][:k]
-
-        x_index += 1
-
-    visited = [[0]*C for _ in range(R)]
-    visite_flag = 0
-
-    for r in range(R):
-        for c in range(C):
-            if board[r][c] == 0:
-                continue
-            flag = 0
-            for x in range(4):
-                rr = r + dr[x]
-                cc = c + dc[x]
-                if rr == -1 or rr == R:
-                    continue
-
-                if cc == -1:
-                    cc = C - 1
-                elif cc == C:
-                    cc = 0
-
-                if board[rr][cc] == board[r][c]:
-                    flag = 1
-                    visite_flag = 1
-                    if not visited[rr][cc]:
-                        visited[rr][cc] = 1
-                        visit_cnt -= 1
-
-            if flag and not visited[r][c]:
-                visited[r][c] = 1
-                visit_cnt -= 1
-
-    if visit_cnt == 0:
-        cnt_flag = 1
+    if num == 0:
         break
 
-    if visite_flag:
-        for r in range(R):
-            for c in range(C):
-                if visited[r][c]:
-                    board[r][c] = 0
+    for i in range(x, N, x):
+        board[i] = board[i][spin[d]*k:] + board[i][:spin[d]*k]
+
+    delete_board = [[0]*M for _ in range(N)]
+    big_flag = 0
+    for i in range(1, N):
+        for j in range(M):
+            if board[i][j] != 0:
+                flag = 0
+                if j != M - 1:
+                    if board[i][j - 1] != 0 and board[i][j - 1] == board[i][j]:
+                        flag = 1
+                        big_flag = 1
+                        num -= 1
+                        delete_board[i][j] = 1
+                    elif board[i][j + 1] != 0 and board[i][j + 1] == board[i][j]:
+                        flag = 1
+                        big_flag = 1
+                        num -= 1
+                        delete_board[i][j] = 1
+                else:
+                    if board[i][j - 1] != 0 and board[i][j - 1] == board[i][j]:
+                        flag = 1
+                        big_flag = 1
+                        num -= 1
+                        delete_board[i][j] = 1
+                    elif board[i][0] != 0 and board[i][0] == board[i][j]:
+                        flag = 1
+                        big_flag = 1
+                        num -= 1
+                        delete_board[i][j] = 1
+
+                if not flag:
+                    if 1 < i < N - 1:
+                        if board[i - 1][j] != 0 and board[i - 1][j] == board[i][j]:
+                            big_flag = 1
+                            num -= 1
+                            delete_board[i][j] = 1
+                        elif board[i + 1][j] != 0 and board[i + 1][j] == board[i][j]:
+                            big_flag = 1
+                            num -= 1
+                            delete_board[i][j] = 1
+                    elif i == 1:
+                        if board[i + 1][j] != 0 and board[i + 1][j] == board[i][j]:
+                            big_flag = 1
+                            num -= 1
+                            delete_board[i][j] = 1
+                    elif i == N - 1:
+                        if board[i - 1][j] != 0 and board[i - 1][j] == board[i][j]:
+                            big_flag = 1
+                            num -= 1
+                            delete_board[i][j] = 1
+
+    if not big_flag:
+        avg = value / num
+
+        for i in range(1, N):
+            for j in range(M):
+                if board[i][j] != 0:
+                    if board[i][j] > avg:
+                        board[i][j] -= 1
+                        value -= 1
+                    elif board[i][j] < avg:
+                        board[i][j] += 1
+                        value += 1
     else:
-        avg = sum([sum(board[x]) for x in range(R)]) / visit_cnt
+        for i in range(1, N):
+            for j in range(M):
+                if delete_board[i][j]:
+                    value -= board[i][j]
+                    board[i][j] = 0
 
-        for r in range(R):
-            for c in range(C):
-                if board[r][c] == 0:
-                    continue
-                if board[r][c] > avg:
-                    board[r][c] -= 1
-                elif board[r][c] < avg:
-                    board[r][c] += 1
-
-print(sum([sum(board[x]) for x in range(R)])) if cnt_flag == 0 else print(0)
+print(value)
