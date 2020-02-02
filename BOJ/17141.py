@@ -1,39 +1,51 @@
 import sys
-sys.stdin = open('input/17135.txt')
+sys.stdin = open('input/17141.txt')
+
+
+def init():
+    global empty
+    for r in range(N):
+        for c in range(N):
+            if board[r][c] == 0:
+                empty += 1
+            elif board[r][c] == 2:
+                possible_virus.append([r, c])
+    empty += len(possible_virus) - K
 
 
 def check(count, start):
     global result
     if count == K:
-        time = 0
-        room_cnt = 0
-        q = [virus[arr[w]][:] for w in range(K)]
-        visited = [[0]*N for _  in range(N)]
+        visited = [[0]*N for _ in range(N)]
+        q = [possible_virus[index] for index in virus_index]
         for r, c in q:
             visited[r][c] = 1
+
+        time = 0
+        occupied = 0
+
         while q:
             time += 1
-            if result < time:
+            if time > result:
                 return
-            contents, q = q, []
-            for r, c in contents:
+
+            qs, q = q, []
+            for r, c in qs:
                 for x in range(4):
-                    rr = r + dr[x]
-                    cc = c + dc[x]
-                    if 0 <= rr < N and 0 <= cc < N and not visited[rr][cc] and board[rr][cc] != 1:
+                    rr, cc = r + dr[x], c + dc[x]
+                    if 0 <= rr < N and 0 <= cc < N and board[rr][cc] != 1 and not visited[rr][cc]:
                         visited[rr][cc] = 1
-                        if board[rr][cc] == 0:
-                            room_cnt += 1
-                        if room_cnt == room:
+                        occupied += 1
+                        if empty == occupied:
                             if result > time:
                                 result = time
                                 return
                         q.append([rr, cc])
     else:
-        for i in range(start, len(virus)):
-            arr[count] = i
+        for i in range(start, len(possible_virus)):
+            virus_index[count] = i
             check(count + 1, i + 1)
-            arr[count] = 0
+            virus_index[count] = None
 
 
 dr = [-1, 1, 0, 0]
@@ -41,21 +53,15 @@ dc = [0, 0, -1, 1]
 N, K = map(int, input().split())
 board = [list(map(int, input().split())) for _ in range(N)]
 
-room = -K
-virus = []
-for i in range(N):
-    for j in range(N):
-        if board[i][j] == 0:
-            room += 1
-        elif board[i][j] == 2:
-            virus.append([i, j])
-            board[i][j] = 0
-            room += 1
+empty = 0
+possible_virus = []
+init()
 
-if room:
-    result = float('inf')
-    arr = [0]*K
-    check(0, 0)
-    print(result) if result != float('inf') else print(-1)
-else:
+if empty == 0:
     print(0)
+else:
+    result = float('inf')
+    virus_index = [None]*K
+    check(0, 0)
+
+    print(-1) if result == float('inf') else print(result)
