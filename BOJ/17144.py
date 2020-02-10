@@ -3,131 +3,94 @@ sys.stdin = open('input/17144.txt')
 
 
 def find_robot():
-    for i in range(R):
-        if board[i][0] == -1:
-            return [[i, 0], [i + 1, 0]]
-
-
-def spread():
-    add_board = [[0]*C for _ in range(R)]
     for r in range(R):
-        for c in range(C):
-            if board[r][c] >= 5:
-                cnt = 0
-                el = int(board[r][c]/5)
-                for x in range(4):
-                    rr = r + dr[x]
-                    cc = c + dc[x]
-                    if 0 <= rr < R and 0 <= cc < C and [rr, cc] not in robot:
-                        add_board[rr][cc] += el
-                        cnt += 1
-                if cnt:
-                    board[r][c] -= cnt * el
-
-    for i in range(R):
-        for j in range(C):
-            if add_board[i][j]:
-                board[i][j] += add_board[i][j]
-
-
-def rotate():
-    r1 = robot[0][0]
-    r2 = robot[1][0]
-
-    tmp1 = 0
-    tmp2 = None
-    for c in range(1, C):
-        if tmp1 == None:
-            tmp1 = board[r1][c]
-            board[r1][c] = tmp2
-            tmp2 = None
-        elif tmp2 == None:
-            tmp2 = board[r1][c]
-            board[r1][c] = tmp1
-            tmp1 = None
-
-    for r in range(r1 - 1, -1, -1):
-        if tmp1 == None:
-            tmp1 = board[r][C - 1]
-            board[r][C - 1] = tmp2
-            tmp2 = None
-        elif tmp2 == None:
-            tmp2 = board[r][C - 1]
-            board[r][C - 1] = tmp1
-            tmp1 = None
-
-    for c in range(C - 2, -1, -1):
-        if tmp1 == None:
-            tmp1 = board[0][c]
-            board[0][c] = tmp2
-            tmp2 = None
-        elif tmp2 == None:
-            tmp2 = board[0][c]
-            board[0][c] = tmp1
-            tmp1 = None
-
-    for r in range(1, r1):
-        if tmp1 == None:
-            tmp1 = board[r][0]
-            board[r][0] = tmp2
-            tmp2 = None
-        elif tmp2 == None:
-            tmp2 = board[r][0]
-            board[r][0] = tmp1
-            tmp1 = None
-
-    tmp1 = 0
-    tmp2 = None
-    for c in range(1, C):
-        if tmp1 == None:
-            tmp1 = board[r2][c]
-            board[r2][c] = tmp2
-            tmp2 = None
-        elif tmp2 == None:
-            tmp2 = board[r2][c]
-            board[r2][c] = tmp1
-            tmp1 = None
-
-    for r in range(r2 + 1, R):
-        if tmp1 == None:
-            tmp1 = board[r][C - 1]
-            board[r][C - 1] = tmp2
-            tmp2 = None
-        elif tmp2 == None:
-            tmp2 = board[r][C - 1]
-            board[r][C - 1] = tmp1
-            tmp1 = None
-
-    for c in range(C - 2, -1, -1):
-        if tmp1 == None:
-            tmp1 = board[R - 1][c]
-            board[R - 1][c] = tmp2
-            tmp2 = None
-        elif tmp2 == None:
-            tmp2 = board[R - 1][c]
-            board[R - 1][c] = tmp1
-            tmp1 = None
-
-    for r in range(R - 2, r2, -1):
-        if tmp1 == None:
-            tmp1 = board[r][0]
-            board[r][0] = tmp2
-            tmp2 = None
-        elif tmp2 == None:
-            tmp2 = board[r][0]
-            board[r][0] = tmp1
-            tmp1 = None
+        if board[r][0] == -1:
+            return r
 
 
 dr = [-1, 1, 0, 0]
 dc = [0, 0, -1, 1]
+ccw = [3, 0, 2, 1]
+cw = [3, 1, 2, 0]
 R, C, T = map(int, input().split())
 board = [list(map(int, input().split())) for _ in range(R)]
-
 robot = find_robot()
 
 for _ in range(T):
-    spread()
-    rotate()
+    # 확산
+    spread = {}
+    for i in range(R):
+        for j in range(C):
+            if board[i][j] > 0:
+                big_flag = 1
+
+            if board[i][j] >= 5:
+                cnt = 0
+                for x in range(4):
+                    ii, jj = i + dr[x], j + dc[x]
+                    if 0 <= ii < R and 0 <= jj < C and (ii, jj) != (robot, 0) and (ii, jj) != (robot + 1, 0):
+                        if (ii, jj) not in spread:
+                            spread[ii, jj] = int(board[i][j]/5)
+                        else:
+                            spread[ii, jj] += int(board[i][j]/5)
+
+                        cnt += 1
+
+                if cnt:
+                    if (i, j) not in spread:
+                        spread[i, j] = -cnt * int(board[i][j]/5)
+                    else:
+                        spread[i, j] -= cnt * int(board[i][j]/5)
+
+    for key, value in spread.items():
+        board[key[0]][key[1]] += value
+
+    # 공기청정기 위쪽 시계 반대방향
+    r, c = robot, 0
+    tmp1 = 0
+    tmp2 = None
+    for d in ccw:
+        while True:
+            rr, cc = r + dr[d], c + dc[d]
+            if 0 <= rr < R and 0 <= cc < C:
+                if board[rr][cc] == - 1:
+                    break
+
+                if tmp1 is not None:
+                    tmp2 = board[rr][cc]
+                    board[rr][cc] = tmp1
+                    tmp1 = None
+                else:
+                    tmp1 = board[rr][cc]
+                    board[rr][cc] = tmp2
+                    tmp2 = None
+                
+                r, c = rr, cc
+            else:
+                break
+
+    # 공기청정기 아래쪽 시계 방향
+    r, c = robot + 1, 0
+    tmp1 = 0
+    tmp2 = None
+    for d in cw:
+        while True:
+            rr, cc = r + dr[d], c + dc[d]
+            if 0 <= rr < R and 0 <= cc < C:
+                if board[rr][cc] == - 1:
+                    break
+
+                if tmp1 is not None:
+                    tmp2 = board[rr][cc]
+                    board[rr][cc] = tmp1
+                    tmp1 = None
+                else:
+                    tmp1 = board[rr][cc]
+                    board[rr][cc] = tmp2
+                    tmp2 = None
+                
+                r, c = rr, cc
+            else:
+                break
 
 print(sum([board[i][j] for i in range(R) for j in range(C) if board[i][j] > 0]))
