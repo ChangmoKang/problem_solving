@@ -2,57 +2,68 @@ import sys
 sys.stdin = open('input/16236.txt')
 
 
-def find_shark():
-    for i in range(N):
-        for j in range(N):
-            if board[i][j] == 9:
-                board[i][j] = 0
-                return [i, j, 2, 0]
+class Shark:
+    def __init__(self):
+        self.dr = [-1, 1, 0, 0]
+        self.dc = [0, 0, -1, 1]
+
+        self.N = int(input())
+        self.board = [list(map(int, input().split())) for _ in range(self.N)]
+
+        self.loc = self.find_shark_location()
+        self.size = 2
+        self.eat_count = 0
+        self.move_count = 0
+
+        self.go()
 
 
-def bfs():
-    global time
-    visited = [[0]*N for _ in range(N)]
-    visited[status[0]][status[1]] = 1
-    q = [status[:]]
-    eat = []
-    time_cnt = 0
-    while q:
-        if eat:
-            eat.sort()
-            board[eat[0][0]][eat[0][1]] = 0
-            status[0], status[1] = eat[0][0], eat[0][1]
-            if status[3] + 1 == status[2]:
-                status[2] += 1
-                status[3] = 0
-            else:
-                status[3] += 1
-            time += time_cnt
-            return True
-        contents, q = q, []
-        for r, c, *_ in contents:
-            for x in range(4):
-                rr = r + dr[x]
-                cc = c + dc[x]
-                if 0 <= rr < N and 0 <= cc < N and not visited[rr][cc] and board[rr][cc] <= status[2]:
-                    visited[rr][cc] = 1
-                    if 0 < board[rr][cc] < status[2]:
-                        eat.append([rr, cc])
-                    q.append([rr, cc])
-        time_cnt += 1
-    return False
+    def find_shark_location(self):
+        for i in range(self.N):
+            for j in range(self.N):
+                if self.board[i][j] == 9:
+                    self.board[i][j] = 0
+                    return [i, j]
 
 
-dr = [-1, 1, 0, 0]
-dc = [0, 0, -1, 1]
+    def find_and_eat_fish(self):
+        r, c = self.loc
 
-N = int(input())
-board = [list(map(int, input().split())) for _ in range(N)]
-status = find_shark()
+        visited = [[0]*self.N for _ in range(self.N)]
+        visited[r][c] = 1
 
-time = 0
-flag = 0
-while True:
-    if not bfs():
-        break
-print(time)
+        q = [[r, c]]
+        move = 0
+        while q:
+            move += 1
+            qs, q = q, []
+            fish = []
+            for r, c in qs:
+                for x in range(4):
+                    rr, cc = r + self.dr[x], c + self.dc[x]
+                    if 0 <= rr < self.N and 0 <= cc < self.N and not visited[rr][cc] and self.board[rr][cc] <= self.size:
+                        visited[rr][cc] = 1
+                        q.append([rr, cc])
+                        if 0 < self.board[rr][cc] < self.size:
+                            fish.append([rr, cc])
+            if fish:
+                fish.sort(key=lambda x: (x[0], x[1]))
+                self.board[fish[0][0]][fish[0][1]] = 0
+                self.loc = fish[0]
+                self.eat_count += 1
+                if self.eat_count == self.size:
+                    self.size += 1
+                    self.eat_count = 0
+                self.move_count += move
+                return True
+        
+        return False
+
+
+    def go(self):
+        while self.find_and_eat_fish():
+            pass
+        print(self.move_count)
+
+
+shark = Shark()
