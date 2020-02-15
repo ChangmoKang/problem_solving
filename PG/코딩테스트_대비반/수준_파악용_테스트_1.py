@@ -1,14 +1,15 @@
+# 올바른 괄호
 def solution(s):
-    stack = []
-    for v in s:
-        if v == '(':
-            stack.append('(')
+    value = 0
+    for bracket in s:
+        if bracket == '(':
+            value += 1
         else:
-            if stack:
-                stack.pop()
+            if value:
+                value -= 1
             else:
                 return False
-    return stack == []
+    return value == 0
 
 
 if __name__ == "__main__":
