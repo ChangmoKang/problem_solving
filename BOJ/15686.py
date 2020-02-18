@@ -2,49 +2,42 @@ import sys
 sys.stdin = open('input/15686.txt')
 
 
-def calc(fr, to):
-    return abs(fr[1] - to[1]) + abs(fr[0] - to[0])
-
-
 def check(count, start):
     global result
-    if count == K:
-        store = [STORE[arr[w]] for w in range(K)]
-        total_dist = 0
-        for h in home:
-            each_dist = float('inf')
-            for s in store:
-                tmp_dist = calc(h, s)
-                if tmp_dist < each_dist:
-                    each_dist = tmp_dist
-            total_dist += each_dist
-            if total_dist > result:
-                return
+    if count == M:
+        picked_store = [store[x] for x in store_index]
+        sub_result = 0
+
+        for r, c in home:
+            home_result = float('inf')
+            for rr, cc in picked_store:
+                chicken_dist = abs(rr - r) + abs(cc - c)
+                if chicken_dist < home_result:
+                    home_result = chicken_dist
+            sub_result += home_result
         
-        if result > total_dist:
-            result = total_dist
+        if result > sub_result:
+            result = sub_result
     else:
-        for i in range(start, len(STORE)):
-            arr[count] = i
+        for i in range(start, len(store)):
+            store_index[count] = i
             check(count + 1, i + 1)
-            arr[count] = 0
+            store_index[count] = None
 
 
-N, K = map(int, input().split())
+N, M = map(int, input().split())
 board = [list(map(int, input().split())) for _ in range(N)]
 
 home = []
-STORE = []
+store = []
 for i in range(N):
     for j in range(N):
         if board[i][j] == 1:
             home.append([i, j])
         elif board[i][j] == 2:
-            board[i][j] = 0
-            STORE.append([i, j])
-
+            store.append([i, j])
 
 result = float('inf')
-arr = [0]*K
+store_index = [None]*M
 check(0, 0)
 print(result)
