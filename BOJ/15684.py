@@ -4,62 +4,53 @@ sys.stdin = open('input/15684.txt')
 
 def test():
     for c in range(C):
-        location = c
+        curr_loc = c
+
         for r in range(R):
-            if location - 1 >= 0 and board[r][location - 1]:
-                location -= 1
-            elif location < C - 1 and board[r][location]:
-                location += 1
-        if location != c:
-            return 0
-    return 1
+            if board[r][curr_loc]:
+                curr_loc += 1
+            elif curr_loc > 0 and board[r][curr_loc - 1]:
+                curr_loc -= 1
+                
+        if c != curr_loc:
+            return False
+    return True
 
 
 def check(r, c, count):
     global result
-    if count == 3:
-        pass
+    if count == k:
+        if test():
+            result = count
     else:
-        if result > count + 1:
-            while True:
-                if c == (C - 1) - 1:
-                    r += 1
-                    c = 0
-                else:
-                    c += 1
+        while True:
+            if c == C - 1:
+                r += 1
+                c = 0
+            else:
+                c += 1
 
-                if r == R:
-                    break
+            if r == R:
+                break
 
-
-                if board[r][c] or (c - 1 >= 0 and board[r][c - 1]) or (c + 1 < C - 1 and board[r][c + 1]):
-                    continue
-                
+            if c != C - 1 and not board[r][c]:
                 board[r][c] = 1
-                if test():
-                    result = count + 1
                 check(r, c, count + 1)
-                board[r][c] = 0
+                board[r][c] = 0            
 
 
-C, K, R = map(int, input().split())
-board = [[0]*(C - 1) for _ in range(R)]
-result = float('inf')
+C, M, R = map(int, input().split())
+board = [[0]*C for _ in range(R)]
+for _ in range(M):
+    a, b = map(int, input().split())
+    board[a - 1][b - 1] = 1
 
-for _ in range(K):
-    r, c = map(int, input().split())
-    board[r - 1][c - 1] = 1
-
-if K == 0:
+if test():
     print(0)
-elif K == R * (C - 1):
-    if test():
-        print(0)
-    else:
-        print(-1)
 else:
-    if test():
-        print(0)
-    else:
+    result = -1
+    for k in range(1, 4):
+        if result != - 1:
+            break
         check(0, -1, 0)
-        print(result) if result != float('inf') else print(-1)
+    print(result)
