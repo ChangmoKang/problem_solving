@@ -1,22 +1,20 @@
 import heapq
+from collections import deque
 
 def solution(healths, items):
+    ATTACK, DAMAGE, IDX = 0, 1, 2
+    
     healths.sort()
-    healths_visited = [0]*len(healths)
-    
-    items = [[-item[0], item[1], item_index + 1] for item_index, item in enumerate(items)]
-    heapq.heapify(items)
-    
-    answer = []
-    while items:
-        _, damage, index = heapq.heappop(items)
+    items = deque(sorted([(*item, idx) for idx, item in enumerate(items, 1)], key=lambda x: x[DAMAGE]))
 
-        for health_index, health in enumerate(healths):
-            if not healths_visited[health_index]:
-                if health - damage >= 100:
-                    healths_visited[health_index] = 1
-                    answer.append(index)
-                    break
-        
+    answer = []
+    available_items = []
+    for health in healths:
+        while items and health - items[0][DAMAGE] >= 100:
+            target_item = items.popleft()
+            heapq.heappush(available_items, (-target_item[ATTACK], target_item[IDX]))
+        if available_items:
+            answer.append(heapq.heappop(available_items)[1])
+
     answer.sort()
     return answer
