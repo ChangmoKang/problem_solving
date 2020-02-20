@@ -35,5 +35,5 @@ def solution(m, n, infests, vaccinateds):
                     return employee[next_r][next_c]
                 infests.append([next_r, next_c])
     
-    # 병을 퍼트린 후에도 직원이 남아있기 때문에 -1을 리턴
+    # 병을 퍼트린 후에도 NORMAL 직원이 남아있기 때문에 -1을 리턴
     return -1
