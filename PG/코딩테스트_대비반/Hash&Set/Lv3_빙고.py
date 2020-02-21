@@ -1,3 +1,5 @@
+from collections import Counter, defaultdict
+
 def solution(board, nums):
     N = len(board)
     
@@ -6,43 +8,17 @@ def solution(board, nums):
         return 2*N + 2
     
     num_to_coord = {board[r][c]: (r, c) for r in range(N) for c in range(N)}
-    
-    checked_board = [[False]*N for _ in range(N)]
 
+    bingo = defaultdict(int)
+    
     for num in nums:
         r, c = num_to_coord[num]
-        checked_board[r][c] = True
-    
-    answer = 0
-    
-    # 가로방향 검색
-    for r in range(N):
-        for c in range(N):
-            if not checked_board[r][c]:
-                break
-        else:
-            answer += 1
+        bingo[f"r{r}"] += 1
+        bingo[f"c{c}"] += 1
+        
+        if r == c:
+            bingo["d0"] += 1
+        if c == N - 1 - r:
+            bingo["d1"] += 1
             
-    # 세로방향 검색
-    for c in range(N):
-        for r in range(N):
-            if not checked_board[r][c]:
-                break
-        else:
-            answer += 1
-            
-    # 대각선 방향 검색
-    for r in range(N):
-        if not checked_board[r][r]:
-            break
-    else:
-        answer += 1
-
-    # 대각선 방향 검색
-    for r in range(N):
-        if not checked_board[r][(N - 1) - r]:
-            break
-    else:
-        answer += 1
-    
-    return answer
+    return Counter(bingo.values()).get(N, 0)
