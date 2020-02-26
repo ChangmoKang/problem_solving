@@ -1,5 +1,3 @@
-from collections import Counter, defaultdict
-
 def solution(board, nums):
     N = len(board)
     
@@ -7,18 +5,19 @@ def solution(board, nums):
     if len(nums) == N * N:
         return 2*N + 2
     
-    num_to_coord = {board[r][c]: (r, c) for r in range(N) for c in range(N)}
+    nums = set(nums)
 
-    bingo = defaultdict(int)
-    
-    for num in nums:
-        r, c = num_to_coord[num]
-        bingo[f"r{r}"] += 1
-        bingo[f"c{c}"] += 1
-        
-        if r == c:
-            bingo["d0"] += 1
-        if c == N - 1 - r:
-            bingo["d1"] += 1
-            
-    return Counter(bingo.values()).get(N, 0)
+    row, col, diag = [0]*N, [0]*N, [0]*2
+
+    for r in range(N):
+        for c in range(N):
+            if board[r][c] in nums:
+                row[r] += 1
+                col[c] += 1
+
+                if r == c:
+                    diag[0] += 1
+                if r + c == N - 1:
+                    diag[1] += 1
+
+    return [*row, *col, *diag].count(N)
