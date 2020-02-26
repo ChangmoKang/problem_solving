@@ -9,9 +9,9 @@ def solution(board, nums):
 
     row, col, diag = [0]*N, [0]*N, [0]*2
 
-    for r in range(N):
-        for c in range(N):
-            if board[r][c] in nums:
+    for r, row in enumerate(board):
+        for c, number in enumerate(row):
+            if number in nums:
                 row[r] += 1
                 col[c] += 1
 
