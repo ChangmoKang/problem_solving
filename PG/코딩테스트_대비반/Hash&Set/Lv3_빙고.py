@@ -7,17 +7,17 @@ def solution(board, nums):
     
     nums = set(nums)
 
-    row, col, diag = [0]*N, [0]*N, [0]*2
+    row_bingo, col_bingo, diag_bingo = [0]*N, [0]*N, [0]*2
 
     for r, row in enumerate(board):
         for c, number in enumerate(row):
             if number in nums:
-                row[r] += 1
-                col[c] += 1
+                row_bingo[r] += 1
+                col_bingo[c] += 1
 
                 if r == c:
-                    diag[0] += 1
+                    diag_bingo[0] += 1
                 if r + c == N - 1:
-                    diag[1] += 1
+                    diag_bingo[1] += 1
 
-    return [*row, *col, *diag].count(N)
+    return [*row_bingo, *col_bingo, *diag_bingo].count(N)
