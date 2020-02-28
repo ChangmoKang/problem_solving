@@ -5,7 +5,7 @@ def solution(budgets, M):
     l, r = 1, max(budgets)
     
     while l <= r:
-        m = int((l + r)/2)
+        m = (l + r) // 2
         
         temp_budgets = sum(m if budget > m else budget for budget in budgets)
         
