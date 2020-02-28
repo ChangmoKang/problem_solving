@@ -3,22 +3,20 @@ def solution(n):
         nonlocal answer
         if r == n:
             answer += 1
-        else:
-            for c in range(n):
-                if c in cols_set:
-                    for rr in range(r):
-                        if r - rr == abs(cols[rr] - c):
-                            break
-                    else:
-                        cols[r] = c
-                        cols_set.remove(c)
-                        check(r + 1)
-                        cols_set.add(c)
-                        cols[r] = None
+            return
+
+        for c in range(n):
+            if c not in col_set and r - c not in diag_set1 and r + c not in diag_set2:
+                col_set.add(c)
+                diag_set1.add(r - c)
+                diag_set2.add(r + c)
+                check(r + 1)
+                col_set.remove(c)
+                diag_set1.remove(r - c)
+                diag_set2.remove(r + c)
 
 
     answer = 0
-    cols = [None]*n
-    cols_set = set(range(n))
+    col_set, diag_set1, diag_set2 = set(), set(), set()
     check(0)
     return answer
