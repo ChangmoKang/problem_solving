@@ -9,12 +9,9 @@ def solution(budgets, M):
         
         temp_budgets = sum(m if budget > m else budget for budget in budgets)
         
-        if temp_budgets == M:
-            return m
-        
         if temp_budgets > M:
             r = m - 1
         else:
             l = m + 1
 
-    return r
+    return l - 1
