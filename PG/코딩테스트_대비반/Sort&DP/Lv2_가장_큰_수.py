@@ -1,33 +1,30 @@
-def merge_sort(arr):
-    if len(arr) < 2:
-        return arr
+class MyStrNumber:
+    def __init__(self, num):
+        self.num = str(num)
 
-    mid = len(arr) // 2
-    left_arr = merge_sort(arr[:mid])
-    right_arr = merge_sort(arr[mid:])
+    def __lt__(self, other):
+        return self.num + other.num < other.num + self.num
 
-    sorted_arr = []
-
-    l = r = 0
-    while l < len(left_arr) and r < len(right_arr):
-        if int(left_arr[l] + right_arr[r]) > int(right_arr[r] + left_arr[l]):
-            sorted_arr.append(left_arr[l])
-            l += 1
-        else:
-            sorted_arr.append(right_arr[r])
-            r += 1
-
-    sorted_arr += left_arr[l:]
-    sorted_arr += right_arr[r:]
-
-    return sorted_arr
+    def __repr__(self):
+        return self.num
 
 
-def solution(numbers):    
+def solution(numbers):
     if sum(numbers) == 0:
         return '0'
 
-    str_numbers = list(map(str, numbers))
-    sorted_str_numbers = merge_sort(str_numbers)
+    str_numbers = [MyStrNumber(num) for num in numbers]
+    str_numbers.sort(reverse=True)
 
-    return "".join(sorted_str_numbers)
+    return "".join(map(str, str_numbers))
+
+"""
+>>> lambda를 이용한 방법 (제일 빠름)
+def solution(numbers):
+    if sum(numbers) == 0:
+        return '0'
+
+    numbers.sort(key=lambda x:str(x)*3, reverse=True)
+
+    return "".join(map(str, numbers))
+"""
