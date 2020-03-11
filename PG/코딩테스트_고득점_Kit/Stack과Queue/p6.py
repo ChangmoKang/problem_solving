@@ -1,17 +1,13 @@
 def solution(prices):
-    answer = []
-    for index1 in range(len(prices) - 1):
-        price1 = prices[index1]
-        flag = 0
-        for index2 in range(index1 + 1, len(prices)):
-            price2 = prices[index2]
-            if price1 > price2:
-                answer.append(index2 - index1)
-                flag = 1
+    N = len(prices)
+    answer = [0]*N
+    for i in range(N):
+        i_moment_price = prices[i]
+        for j in range(i + 1, N):
+            j_moment_price = prices[j]
+            answer[i] += 1
+            if i_moment_price > j_moment_price:
                 break
-        if not flag:
-            answer.append(index2 - index1)
-    answer.append(0)
     return answer
 
 
