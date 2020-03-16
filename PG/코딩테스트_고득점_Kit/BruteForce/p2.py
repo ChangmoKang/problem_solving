@@ -9,17 +9,13 @@ def solution(numbers):
         return {x for x in range(n + 1) if is_primes[x]}
 
 
-    answer = 0        
-    primes = get_primes(10**len(numbers))
+    N = len(numbers)
+    primes = get_primes(pow(10, N))
 
-    save = set()
+    nums = set()
 
-    for i in range(1, len(numbers) + 1):
-        for tmp in permutations(numbers, i):
-            save.add(int("".join(tmp)))
+    for i in range(1, N + 1):
+        for num_str in permutations(numbers, i):
+            nums.add(int("".join(num_str)))
 
-    for num in save:
-        if num in primes:
-            answer += 1
-
-    return answer
+    return sum(1 for num in nums if num in primes)
