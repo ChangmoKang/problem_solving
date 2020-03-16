@@ -1,35 +1,25 @@
+from collections import defaultdict
+
+GENRE, PLAY = 0, 1
+INDEX = 0
+RECORD = 2
 def solution(genres, plays):
-    answer = []
-    # 고유 번호를 재생 횟수에 입력
-    plays = list(enumerate(plays))
-
-    # 장르별로 분류하는 작업
-    dic = {}
-    for i in range(len(genres)):
-        genre = genres[i]
-        if genre not in dic:
-            dic[genre] = [plays[i]]
-        else:
-            dic[genre].append(plays[i])
+    music_dic = defaultdict(list)
+    count_dic = defaultdict(int)
     
-    # 각 장르별 내림차순 정렬
-    for key in dic:
-        dic[key].sort(key=lambda x: x[1], reverse=True)
+    for index, music in enumerate(zip(genres, plays)):
+        music_dic[music[GENRE]].append([index, music[PLAY]])
+        count_dic[music[GENRE]] += music[PLAY]
     
-
-    # 각각의 장르에 총 재생 횟수와 재생 횟수를 기준으로 내림차순 정렬
-    each_genre_sum = []
-    for key, value in dic.items():
-        each_genre_sum.append([key, sum([value[w][1] for w in range(len(value))])])
-    each_genre_sum.sort(key=lambda x: x[1], reverse=True)
+    for genre in music_dic:
+        music_dic[genre].sort(reverse=True, key=lambda x:x[PLAY])
+        music_dic[genre] = [music[INDEX] for music in music_dic[genre]]
+        
+    result = []
+    for music in sorted(count_dic.items(), key=lambda x: -x[PLAY]):
+        result += music_dic[music[GENRE]][:RECORD]
     
-    # 재생 횟수가 가장 큰 장르부터 두개씩 고유번호 추출
-    for i in range(len(dic)):
-        answer.extend(dic[each_genre_sum[i][0]][:2])
-
-    # 다듬기
-    answer = [answer[i][0] for i in range(len(answer))]
-    return answer
+    return result
 
 
 if __name__ == "__main__":
