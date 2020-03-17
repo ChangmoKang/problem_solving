@@ -9,7 +9,7 @@ def solution(jobs):
     jobs = deque(jobs)
     
     wait_jobs = []
-    time = jobs[0][0]
+    time = jobs[0][REQUEST_TIME]
     
     while jobs or wait_jobs:
         if not wait_jobs and jobs and time < jobs[0][REQUEST_TIME]:
@@ -19,12 +19,8 @@ def solution(jobs):
             start, duration = jobs.popleft()
             heapq.heappush(wait_jobs, (duration, start))
         
-        if wait_jobs:
-            duration, start = heapq.heappop(wait_jobs)
-            time += duration
-        elif jobs:
-            start, duration = jobs.popleft
-            time = start + duration
+        duration, start = heapq.heappop(wait_jobs)
+        time += duration
 
         answer += (time - start)
     
