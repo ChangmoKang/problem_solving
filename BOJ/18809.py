@@ -1,55 +1,67 @@
 import sys
 from itertools import combinations
 sys.stdin = open('input/18809.txt')
+input = sys.stdin.readline
 
 dr = [-1, 1, 0, 0]
 dc = [0, 0, -1, 1]
+
+KIND = 1
+EMPTY, RED, GREEN, FLOWER = 0, 1, 2, 3
 
 N, M, G, R = map(int, input().split())
 board = [list(map(int, input().split())) for _ in range(N)]
 available = [(i, j) for i in range(N) for j in range(M) if board[i][j] == 2]
 
 result = 0
-for tmp_a in combinations(range(len(available)), R):
-    tmp = set(range(len(available))) - set(tmp_a)
-    for tmp_b in combinations(tmp, G):
+for R_available in combinations(range(len(available)), R):
+    left_available = set(range(len(available))) - set(R_available)
+    for G_available in combinations(left_available, G):
         sub_result = 0
-        visited = [[0]*M for _ in range(N)]
+        visited = [[[0]*2 for _ in range(M)] for _ in range(N)]
 
-        a = {available[t] for t in tmp_a}
-        b = {available[t] for t in tmp_b}
+        red = [available[elem] for elem in R_available]
+        green = [available[elem] for elem in G_available]
 
-        for r, c in a:
-            visited[r][c] = 1
+        for r, c in red:
+            visited[r][c][KIND] = RED
         
-        for r, c in b:
-            visited[r][c] = 1
+        for r, c in green:
+            visited[r][c][KIND] = GREEN
 
-        time = 1
-        while a and b:
+        time = 0
+        while red and green:
             time += 1
 
-            aa, a = a, set()
-            for r, c in aa:
+            reds, red = red, []
+            for r, c in reds:
+                if visited[r][c][KIND] == FLOWER:
+                    continue
+
                 for x in range(4):
                     rr, cc = r + dr[x], c + dc[x]
-                    if 0 <= rr < N and 0 <= cc < M and not visited[rr][cc] and board[rr][cc] != 0:
-                        visited[rr][cc] = time
-                        a.add((rr, cc))
+                    if not (0 <= rr < N and 0 <= cc < M) or board[rr][cc] == 0:
+                        continue
 
-            bb, b = b, set()
-            for r, c in bb:
+                    if visited[rr][cc][KIND] == EMPTY:
+                        visited[rr][cc] = [time, RED]
+                        red.append([rr, cc])
+
+
+            greens, green = green, []
+            for r, c in greens:
                 for x in range(4):
                     rr, cc = r + dr[x], c + dc[x]
-                    if 0 <= rr < N and 0 <= cc < M and (not visited[rr][cc] or visited[rr][cc] == time) and board[rr][cc] != 0:
-                        if visited[rr][cc] == time and (rr, cc) not in b:
-                            visited[rr][cc] = float('inf')
-                            a.remove((rr, cc))
-                            sub_result += 1
-                            continue
+                    if not (0 <= rr < N and 0 <= cc < M) or board[rr][cc] == 0:
+                        continue
 
-                        visited[rr][cc] = time
-                        b.add((rr, cc))
+                    if visited[rr][cc][KIND] == EMPTY:
+                        visited[rr][cc] = [time, GREEN]
+                        green.append([rr, cc])
+
+                    elif visited[rr][cc] == [time, RED]:
+                        visited[rr][cc][KIND] = FLOWER
+                        sub_result += 1
 
         if sub_result > result:
             result = sub_result
