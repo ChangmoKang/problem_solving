@@ -42,10 +42,13 @@ dcc = [-2, -1, 1, 2, 2, 1, -1, -2]
 
 K = int(input())
 C, R = map(int, input().split())
-board = [list(map(int, input().split())) for _ in range(R)]
-# 말처럼 이동 가능한 횟수에 따른 visited 준비
-visited = [[[float('inf')]*C for _ in range(R)] for _ in range(K + 1)]
+if R == 1 and C == 1:
+    print(0)
+else:
+    board = [list(map(int, input().split())) for _ in range(R)]
+    # 말처럼 이동 가능한 횟수에 따른 visited 준비
+    visited = [[[float('inf')]*C for _ in range(R)] for _ in range(K + 1)]
 
-result = float('inf')
-bfs([0, 0, 0, K])
-print(-1) if result == float('inf') else print(result)
+    result = float('inf')
+    bfs([0, 0, 0, K])
+    print(-1) if result == float('inf') else print(result)
