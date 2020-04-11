@@ -1,84 +1,115 @@
 import sys
+from itertools import product
+from collections import deque
 sys.stdin = open('input/17472.txt')
 
 
-def numbering(r, c):
-    q = [[r, c]]
-    while q:
-        contents, q = q, []
-        for content in contents:
-            for x in range(4):
-                rr = content[0] + dr[x]
-                cc = content[1] + dc[x]
-                if 0 <= rr < R and 0 <= cc < C and board[rr][cc]:
-                    if not visited[rr][cc]:
-                        visited[rr][cc] = 1
-                        board[rr][cc] = N
-                        q.append([rr, cc])
+def get_parent(x):
+    if parent[x] == x:
+        return x
+    
+    parent[x] = get_parent(parent[x])
+    return parent[x]
 
 
-def dfs(r, c, d, count):
-    rr = r + dr[d]
-    cc = c + dc[d]
-    if 0 <= rr < R and 0 <= cc < C:
-        if board[rr][cc] == 0:
-            dfs(rr, cc, d, count + 1)
-        elif board[rr][cc] != 0 and board[rr][cc] != board[i][j]:
-            to_num = board[rr][cc]
-            if count > 1 and dist[from_num][to_num] > count:
-                dist[from_num][to_num] = count
+def union_parent(a, b):
+    a = get_parent(a)
+    b = get_parent(b)
 
-
-def check(sub_result, count):
-    global result
-    if sum([1 for v in visited if v]) == N:
-        if result > sub_result and count == N - 2:
-            result = sub_result
+    if a < b:
+        parent[b] = a
     else:
-        for r in range(1, N):
-            for c in range(1, N):
-                if dist[r][c] != float('inf'):
-                    if not visited[r]:
-                        visited[r] = 1
-                        if not visited[c]:
-                            visited[c] = 1
-                            check(sub_result + dist[r][c], count + 1)
-                            visited[c] = 0
-                        visited[r] = 0
-                    else:
-                        if not visited[c]:
-                            visited[c] = 1
-                            check(sub_result + dist[r][c], count + 1)
-                            visited[c] = 0
+        parent[a] = b
+
+
+def find_parent(a, b):
+    a = get_parent(a)
+    b = get_parent(b)
+
+    return True if a == b else False
 
 
 dr = [-1, 1, 0, 0]
 dc = [0, 0, -1, 1]
+
 R, C = map(int, input().split())
 board = [list(map(int, input().split())) for _ in range(R)]
-
-N = 1
 visited = [[0]*C for _ in range(R)]
-for i in range(R):
-    for j in range(C):
-        if board[i][j] and not visited[i][j]:
-            board[i][j] = N
-            visited[i][j] = 1
-            numbering(i, j)
-            N += 1
 
-dist = [[float('inf')]*N for _ in range(N)]
+num = 0
+for i, j in product(range(R), range(C)):
+    if not visited[i][j] and board[i][j]:
+        num += 1
 
-for i in range(R):
-    for j in range(C):
-        if board[i][j]:
-            from_num = board[i][j]
+        q = deque([[i, j]])
+        visited[i][j] = num
+
+        while q:
+            r, c = q.popleft()
             for x in range(4):
-                dfs(i, j, x, 0)
+                rr, cc = r + dr[x], c + dc[x]
+                if 0 <= rr < R and 0 <= cc < C and not visited[rr][cc] and board[rr][cc]:
+                    visited[rr][cc] = num
+                    q.append([rr, cc])
 
+parent = list(range(num + 1))
 
-visited = [1] + [0]*(N-1)
-result = float('inf')
+adj = {}
 
-check(0, 0)
-print(result) if result != float('inf') else print(-1)
+for r, c in product(range(R), range(C)):
+    if board[r][c]:
+        for x in range(4):
+            rr, cc = r, c
+            dist = 0
+            while True:
+                rr += dr[x]
+                cc += dc[x]
+
+                if not (0 <= rr < R and 0 <= cc < C):
+                    break
+
+                if not board[rr][cc]:
+                    dist += 1
+                    continue
+
+                if visited[r][c] == visited[rr][cc]:
+                    break
+
+                if board[rr][cc] and visited[r][c] != visited[rr][cc]:
+                    if dist < 2:
+                        break
+
+                    a, b = visited[r][c], visited[rr][cc]
+
+                    if a < b:
+                        if (a, b) not in adj:
+                            adj[a, b] = dist
+                        else:
+                            if adj[a, b] > dist:
+                                adj[a, b] = dist
+                    else:
+                        if (b, a) not in adj:
+                            adj[b, a] = dist
+                        else:
+                            if adj[b, a] > dist:
+                                adj[b, a] = dist
+
+                    break
+
+result = []
+for node, value in adj.items():
+    result.append([node[0], node[1], value])
+result.sort(key=lambda x: x[2])
+
+answer = 0
+cnt = 0
+for a, b, v in result:
+    if not find_parent(a, b):
+        union_parent(a, b)
+        cnt += 1
+        answer += v
+
+for i in range(1, num + 1):
+    get_parent(i)
+
+print(answer) if sum(parent) == num else print(-1)
