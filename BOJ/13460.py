@@ -395,19 +395,19 @@ def bfs():
     q = [[ori_red, ori_blue]]
     save = set()
     save.add((ori_red, ori_blue))
-    cnt = 0
+    cnt = 1
     while q:
         qs, q = q, []
         for target_red, target_blue in qs:
-            if board[target_blue[R]][target_blue[C]] == EXIT:
-                continue
-
-            if board[target_red[R]][target_red[C]] == EXIT:
-                return cnt
 
             for x in range(4):
                 new_r, new_b = move(x, target_red, target_blue)
                 if (new_r, new_b) not in save:
+                    if board[new_b[R]][new_b[C]] == EXIT:
+                        continue
+
+                    if board[new_r[R]][new_r[C]] == EXIT:
+                        return cnt
                     q.append([new_r, new_b])
                     save.add((new_r, new_b))
 
