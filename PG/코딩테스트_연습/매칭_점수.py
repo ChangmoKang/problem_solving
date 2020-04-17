@@ -2,7 +2,7 @@ import re
 
 def solution(word, pages):
     url_finder = re.compile('<meta property="og:url" content="https://(.+)"/>')
-    link_finder = re.compile('<a href="https://(.*)">')
+    # link_finder = re.compile('<a href="https://(.*)">')
     
     result = {}
     for i, page in enumerate(pages):
