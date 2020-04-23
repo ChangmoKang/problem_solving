@@ -27,4 +27,5 @@ def solution(tickets):
 
     answer = []
     dfs('ICN', 0, ['ICN'])
+
     return answer
