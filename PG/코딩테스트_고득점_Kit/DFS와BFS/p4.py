@@ -1,7 +1,7 @@
-FROM, TO = 0, 1
+RECENT, FROM, TO = -1, 0, 1
 def solution(tickets):
 
-    def dfs(start, count, route):
+    def dfs(count, route):
         nonlocal answer
 
         if answer:
@@ -10,15 +10,15 @@ def solution(tickets):
         if count == N:
             answer = route[:]
             return
-        else:
-            for i, ticket in enumerate(tickets):
-                if not visited[i] and ticket[FROM] == start:
-                    visited[i] = True
-                    route.append(ticket[TO])
-                    dfs(ticket[TO], count + 1, route)
-                    route.pop()
-                    visited[i] = False
-                    
+
+        for i, ticket in enumerate(tickets):
+            if not visited[i] and ticket[FROM] == route[RECENT]:
+                visited[i] = True
+                route.append(ticket[TO])
+                dfs(count + 1, route)
+                route.pop()
+                visited[i] = False
+                
 
     tickets.sort(key=lambda x: x[1])
 
@@ -26,6 +26,6 @@ def solution(tickets):
     visited = [False]*N
 
     answer = []
-    dfs('ICN', 0, ['ICN'])
+    dfs(0, ['ICN'])
 
     return answer
