@@ -41,7 +41,6 @@ for tc in range(1, int(input()) + 1):
     for k in range(K):
         if result <= k:
             break
-        target = [0]*k
         check(0, 0)
 
     print(f"#{tc} {result}")
