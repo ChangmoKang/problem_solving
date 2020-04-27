@@ -1,61 +1,38 @@
 import sys
+from itertools import combinations
+from collections import deque
 sys.stdin = open('input/17471.txt')
 
 
 def bfs(team):
-    visited = [0]*N
-    q = [team[0]]
-    visited[team[0]] = 1
-    team.remove(team[0])
+    q = deque([team[0]])
+    visited = [True] + [False if w in team else True for w in range(1, N + 1)]
+    visited[team[0]] = True
 
     while q:
-        target = q.pop(0)
-        if team == []:
-            return True
-        
-        for i in range(N):
-            if adj[target][i] and i in team and not visited[i]:
-                q.append(i)
-                visited[i] = 1
-                team.remove(i)
-    return False
-
-
-def check(count, one_side_sum):
-    global result
-    if count == N:
-        if sum(divide) == 0 or divide[0] == 1:
-            return
-        A = [x for x in range(N) if divide[x] == 1]
-        B = [x for x in range(N) if divide[x] == 0]
-
-        if bfs(A) and bfs(B):
-            other_side_sum = total - one_side_sum
-            diff = abs(one_side_sum - other_side_sum)
-            if result > diff:
-                result = diff
-    else:
-        for i in range(2):
-            divide[count] = i
-            if i:
-                check(count + 1, one_side_sum + people[count])
-            else:
-                check(count + 1, one_side_sum)
-            divide[count] = 0
+        f = q.popleft()
+        for t in adj[f]:
+            if not visited[t]:
+                visited[t] = True
+                q.append(t)
+    
+    return True if sum(visited) == N + 1 else False
 
 
 N = int(input())
-people = list(map(int, input().split()))
-total = sum(people)
-adj = [[0]*N for _ in range(N)]
+po = [None] + list(map(int, input().split()))
+adj = [None]
 for i in range(N):
-    for j in list(map(int, input().split()))[1:]:
-        adj[i][j - 1] = 1
-        adj[j - 1][i] = 1
+    adj.append(list(map(int, input().split()))[1:])
 
 result = float('inf')
-
-divide = [0]*N
-check(0, 0)
+for k in range(1, N//2 + 1):
+    for team_a in combinations(range(1, N + 1), k):
+        team_b = tuple(set(range(1, N + 1)) - set(team_a))
+        if bfs(team_a) and bfs(team_b):
+            result_a = sum(po[w] for w in range(1, N + 1) if w in team_a)
+            result_b = sum(po[w] for w in range(1, N + 1) if w in team_b)
+            if result > abs(result_a - result_b):
+                result = abs(result_a - result_b)
 
 print(result) if result != float('inf') else print(-1)
