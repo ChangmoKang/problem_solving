@@ -1,74 +1,67 @@
 import sys
+from itertools import product
+from collections import deque
 sys.stdin = open('input/5656.txt')
 
+def bfs():
+    def destroy(r, c):
+        nonlocal new_bricks
+        
+        L = new_board[r][c]
 
-def destroy_brick(info, board, bricks):
-    q = [info]
-    board[info[0]][info[1]] = 0
-    bricks -= 1
+        new_bricks -= 1
+        new_board[r][c] = EMPTY
 
-    while q and bricks:
-        content = q.pop()
-        for i in range(4):
-            for weight in range(1, content[2]):
-                r = content[0] + weight * dr[i]
-                c = content[1] + weight * dc[i]
-                if 0 <= r < R and 0 <= c < C:
-                    if board[r][c]:
-                        q.append([r, c, board[r][c]])
-                        board[r][c] = 0
-                        bricks -= 1
-                else:
+        if L > 1:
+            for rr in range(r - (L - 1), r + L):
+                if 0 <= rr < R and new_board[rr][c] != EMPTY:
+                    destroy(rr, c)
+
+            for cc in range(c - (L - 1), c + L):
+                if 0 <= cc < C and new_board[r][cc] != EMPTY:
+                    destroy(r, cc)
+
+
+    result = o_bricks
+
+    q = deque([[K, o_bricks, o_board]])
+    while q:
+        shots, bricks, board = q.popleft()
+
+        if not shots:
+            if result > bricks:
+                result = bricks
+            continue
+            
+        for i in range(R):
+            for j in range(C):
+                if board[i][j] != EMPTY:
+                    new_bricks = bricks
+                    new_board = [b[:] for b in board]
+
+                    destroy(i, j)
+
+                    if not new_bricks:
+                        return 0
+
+                    for r in range(R):
+                        temp = [elem for elem in new_board[r] if elem != EMPTY]
+                        new_board[r] = [0]*(C - len(temp)) + temp
+
+                    q.append([shots - 1, new_bricks, new_board])
                     break
 
-    return board, bricks
+    return result
 
 
-def move_brick(board):
-    for i in range(R - 2, -1, -1):
-        for j in range(C):
-            if board[i][j]:
-                for idx in range(R - 1, i, - 1):
-                    if board[idx][j] == 0:
-                        board[i][j], board[idx][j] = board[idx][j], board[i][j]
-                        break
-    return board
-
-
-def check(shots, bricks, board):
-    global result
-
-    if not shots or not bricks:
-        if result > bricks:
-            result = bricks
-    else:
-        for j in range(C):
-            for i in range(R):
-                if result and board[i][j]:
-                    copied_board = [board[w][:] for w in range(R)]                    
-                    copied_board, copied_bricks = destroy_brick([i, j, copied_board[i][j]], copied_board, bricks)
-
-                    if copied_bricks:
-                        copied_board = move_brick(copied_board)
-                        check(shots - 1, copied_bricks, copied_board)
-                    else:
-                        result = 0
-                        return
-                    break
-
-
-dr = [-1, 1, 0, 0]
-dc = [0, 0, -1, 1]
+EMPTY = 0
 for tc in range(1, int(input()) + 1):
-    N, C, R = map(int, input().split())
-    board = [list(map(int, input().split())) for _ in range(R)]
-    
-    init_bricks = 0
-    for i in range(R):
-        for j in range(C):
-            if board[i][j]:
-                init_bricks += 1
+    K, R, C = map(int, input().split())
+    o_board = list(map(list, zip(*[list(map(int, input().split())) for _ in range(C)])))
 
-    result = init_bricks
-    check(N, init_bricks, board)
-    print(f"#{tc} {result}")
+    o_bricks = 0
+    for i, j in product(range(R), range(C)):
+        if o_board[i][j] != EMPTY:
+            o_bricks += 1
+    
+    print(f"#{tc} {bfs()}")
