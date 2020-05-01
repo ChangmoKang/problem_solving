@@ -2,26 +2,27 @@ import sys
 sys.stdin = open('input/2115.txt')
 
 
-def calc(r, c, sub_count, sub_result, sub_pow_result):
-    global tmp
-    if sub_count == M - 1:
-        return
+def calc(r, c):
+    max_pow_honey = 0
+    for i in range(1, 1 << M):
+        temp_honey = 0
+        temp_pow_honey = 0
+        for j in range(M):
+            if i & 1 << j:
+                temp_honey += board[r][c + j]
+                temp_pow_honey += pow_board[r][c + j]
+        
+        if temp_honey <= C and temp_pow_honey > max_pow_honey:
+            max_pow_honey = temp_pow_honey
 
-    for i in range(M):
-        if not visited[i]:
-            visited[i] = True
-            if sub_result + board[r][c + i] <= C:
-                if sub_pow_result + pow_board[r][c + i] > tmp:
-                    tmp = sub_pow_result + pow_board[r][c + i]
-                calc(r, c, sub_count + 1, sub_result + board[r][c + i], sub_pow_result + pow_board[r][c + i])
-            visited[i] = False
+    return max_pow_honey
 
 
-def check(r, c, count, result):
-    global tmp, answer
+def check(r, c, count, honey):
+    global answer
     if count == 2:
-        if result > answer:
-            answer = result
+        if honey > answer:
+            answer = honey
         return
 
     while True:
@@ -30,11 +31,9 @@ def check(r, c, count, result):
 
         if c + M <= N:
             if sum(board[r][c:c+M]) <= C:
-                check(r, c + M, count + 1, result + sum(pow_board[r][c:c+M]))
+                check(r, c + M, count + 1, honey + sum(pow_board[r][c:c+M]))
             else:
-                tmp = 0
-                calc(r, c, 0, 0, 0)
-                check(r, c + M, count + 1, result + tmp)
+                check(r, c + M, count + 1, honey + calc(r, c))
         
         if c >= N - 1:
             r += 1
@@ -49,6 +48,5 @@ for tc in range(1, int(input()) + 1):
     pow_board = [[pow(board[r][c], 2) for c in range(N)] for r in range(N)]
 
     answer = 0
-    visited = [False]*M
     check(0, 0, 0, 0)
     print(f"#{tc} {answer}")
