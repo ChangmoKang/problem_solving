@@ -26,7 +26,18 @@ def solution(board):
                 return True
         return False
     
+
+    def move_wings(ws, *args):
+        if len(args) == 1:
+            new_w_a = (wing_a[R] + args[0][R], wing_a[C] + args[0][C])
+            new_w_b = (wing_b[R] + args[0][R], wing_b[C] + args[0][C])
+        else:
+            new_w_a = (wing_a[R] + args[0][R], wing_a[C] + args[0][C])
+            new_w_b = (wing_b[R] + args[1][R], wing_b[C] + args[1][C])
+        
+        return tuple(sorted([new_w_a, new_w_b]))
     
+
     N = len(board)
     destination = (N - 1, N - 1)
     q = deque([
@@ -42,10 +53,7 @@ def solution(board):
 
         wing_a, wing_b = wings
         for x, direct in enumerate(DELTA):
-            new_direct_wing_a = (wing_a[R] + direct[R], wing_a[C] + direct[C])
-            new_direct_wing_b = (wing_b[R] + direct[R], wing_b[C] + direct[C])
-            
-            new_direct_wings = tuple(sorted([new_direct_wing_a, new_direct_wing_b]))
+            new_direct_wings = move_wings(wings, direct)
             
             if is_visitable(*new_direct_wings) and new_direct_wings not in visited:
                 if is_arrived(*new_direct_wings):
@@ -55,11 +63,8 @@ def solution(board):
                 q.append((new_direct_wings, dir, time + 1))
                 
                 if x in SHAPE[dir]:
-                    for rotate_a, rotate_b in ROTATE[x]:
-                        new_rotate_wing_a = (wing_a[R] + rotate_a[R], wing_a[C] + rotate_a[C])
-                        new_rotate_wing_b = (wing_b[R] + rotate_b[R], wing_b[C] + rotate_b[C])
-                        
-                        new_rotate_wings = tuple(sorted([new_rotate_wing_a, new_rotate_wing_b]))
+                    for rotate in ROTATE[x]:
+                        new_rotate_wings = move_wings(wings, *rotate)
                         
                         if new_rotate_wings not in visited:
                             visited.add(new_rotate_wings)
