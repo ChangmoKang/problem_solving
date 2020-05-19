@@ -1,12 +1,9 @@
 def solution(s):
     stack = []
-    for el in s:
-        if stack:
-            if el == stack[-1]:
-                stack.pop()
-            else:
-                stack.append(el)
+    for elem in s:
+        if stack and stack[-1] == elem:
+            stack.pop()
         else:
-            stack.append(el)
-
-    return 0 if stack else 1
+            stack.append(elem)
+    
+    return 1 if not stack else 0
