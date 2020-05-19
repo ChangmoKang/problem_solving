@@ -1,12 +1,13 @@
 def solution(s):
-    s = list(s)
+    stack = []
     
-    answer = [s.pop()]
+    for elem in s:           
+        while stack:
+            if elem > stack[-1]:
+                stack.pop()
+            else:
+                break
+        
+        stack.append(elem)
     
-    while s:
-        el = s.pop()
-
-        if answer[-1] <= el:
-            answer.append(el)
-
-    return "".join(answer[::-1])
+    return "".join(stack)
