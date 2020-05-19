@@ -1,19 +1,17 @@
+BRACKET = {
+    '{': '}',
+    '[': ']',
+    '(': ')'
+}
+
 def solution(s):
-    opposite = {
-        '(': ')',
-        ')': '(',
-        '{': '}',
-        '}': '{',
-        '[': ']',
-        ']': '['
-    }
-    
     stack = []
-    for bracket in s:
-        if bracket in '({[':
-            stack.append(bracket)
+    
+    for elem in s:
+        if elem in '{[(':
+            stack.append(elem)
         else:
-            if stack and bracket == opposite[stack[-1]]:
+            if stack and elem == BRACKET[stack[-1]]:
                 stack.pop()
             else:
                 return False
