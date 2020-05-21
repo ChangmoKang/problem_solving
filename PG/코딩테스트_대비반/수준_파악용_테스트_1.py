@@ -1,15 +1,17 @@
 # 올바른 괄호
 def solution(s):
-    value = 0
+    stack = 0
+    
     for bracket in s:
         if bracket == '(':
-            value += 1
+            stack += 1
         else:
-            if value:
-                value -= 1
+            if stack:
+                stack -= 1
             else:
                 return False
-    return value == 0
+    
+    return not stack
 
 
 if __name__ == "__main__":
