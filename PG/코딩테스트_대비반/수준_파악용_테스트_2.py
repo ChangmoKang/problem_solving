@@ -1,15 +1,13 @@
 # 스킬트리
 def solution(skill, skill_trees):
     answer = 0
+    
     for skill_tree in skill_trees:
-        tree = ''
-        for s in skill_tree:
-            if s in skill:
-                tree += s
+        cleaned = "".join([elem for elem in skill_tree if elem in skill])
         
-        if skill.startswith(tree):
+        if skill.startswith(cleaned):
             answer += 1
-
+    
     return answer
 
 
