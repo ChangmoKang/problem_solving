@@ -91,6 +91,7 @@ def score():
                                 board[index][rrr][c] = temp
     return big_flag
 
+
 def pop():
     for index in range(2):
         for _ in range(2):
